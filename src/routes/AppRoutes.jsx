@@ -1,31 +1,56 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
-// Import layout and pages
-import Dashboard from '../pages/Dashboard/Dashboard';
-import PlanRoute from '../pages/PlanRoute/PlanRoute';
-import Courier from '../pages/Courier/Courier';
-import Fleet from '../pages/Fleet/Fleet';
-import Notification from '../pages/Notification/Notification';
-import Finance from '../pages/Finance/Finance';
-import Driver from '../pages/Driver/Driver';
-import Report from '../pages/Report/Report';
-import Support from '../pages/Support/Support';
-import Login from '../pages/Auth/Login';
-import ForgotPassword from '../pages/Auth/ForgotPassword';
-import Sidebar from '../components/Sidebar';    
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 
+// Lazy load pages
+const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
+const PlanRoute = lazy(() => import('../pages/PlanRoute/PlanRoute'));
+const Courier = lazy(() => import('../pages/Courier/Courier'));
+const Fleet = lazy(() => import('../pages/Fleet/Fleet'));
+const Notification = lazy(() => import('../pages/Notification/Notification'));
+const Finance = lazy(() => import('../pages/Finance/Finance'));
+const Driver = lazy(() => import('../pages/Driver/Driver'));
+const Report = lazy(() => import('../pages/Report/Report'));
+const Support = lazy(() => import('../pages/Support/Support'));
+const Login = lazy(() => import('../pages/Auth/Login'));
+const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
+
+const topbarAttributesMap = {
+    '/dashboard': ['Summary', 'Live Map', 'Recent', 'Notifications'],
+    '/plan-route': ['North', 'South', 'East', 'West'],
+    '/courier': ['Express', 'Standard', 'Same-Day'],
+    '/fleet': ['Available', 'In Maintenance', 'In Use'],
+    '/notification': ['Unread', 'All', 'System'],
+    '/finance': ['Invoices', 'Payments', 'Refunds'],
+    '/driver': ['Active', 'Idle', 'Unavailable'],
+    '/report': ['Daily', 'Weekly', 'Monthly'],
+    '/support': ['Open Tickets', 'Closed Tickets'],
+};
+
+const LayoutWithTopbar = ({ children }) => {
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    // Find matching attributes or return empty array
+    const topAtribute = topbarAttributesMap[currentPath] || [];
+
+    return (
+        <div style={{ display: 'flex', height: '100vh' }}>
+            <Sidebar />
+            <div style={{ flex: 1, overflow: 'auto' }}>
+                <Topbar topAtribute={topAtribute} />
+                {children}
+            </div>
+        </div>
+    );
+};
 
 const AppRoutes = () => {
-    // Define the regions for the topbar
-    const regions = ['North', 'South', 'East', 'West'];
     return (
         <Router>
-            <div style={{ display: 'flex', height: '100vh' }}>
-                <Sidebar />
-                <div style={{ flex: 1, overflow: 'auto' }}>
-                <Topbar regions={regions}/>
+            <Suspense fallback={<div style={{ padding: 20 }}>Loading...</div>}>
+                <LayoutWithTopbar>
                     <Routes>
                         <Route path="/" element={<Navigate to="/dashboard" />} />
                         <Route path="/dashboard" element={<Dashboard />} />
@@ -39,11 +64,10 @@ const AppRoutes = () => {
                         <Route path="/support" element={<Support />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
-                        {/* Optional 404 fallback */}
                         <Route path="*" element={<div><h1>404 - Page Not Found</h1></div>} />
                     </Routes>
-                </div>
-            </div>
+                </LayoutWithTopbar>
+            </Suspense>
         </Router>
     );
 };
