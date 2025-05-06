@@ -2,26 +2,35 @@ src/
 │
 ├── assets/                # Images, icons, logos
 ├── components/            # Reusable UI components
-│   ├── Sidebar/
-│   ├── Topbar/
-│   ├── RouteCard/
-│   ├── RouteMap/
-│   ├── RouteDetails/
-│   ├── DriverSuggestion/
-│   ├── StatusTag/
-│   ├── ParcelItem/
-│   └── Buttons/
+│   ├── Sidebar.jsx/
+│   ├── Topbar.jsx/
+│   ├── RouteCard.jsx/
+│   ├── RouteMap.jsx/
+│   ├── RouteDetails.jsx/
+│   ├── DriverSuggestion.jsx/
+│   ├── StatusTag.jsx/
+│   ├── ParcelItem.jsx/
+│   └── Buttons.jsx/
 │
-├── pages/                 # Full pages/views
+├── pages/                 # 
 │   ├── Dashboard/
+│       └── Dashboard.jsx
 │   ├── PlanRoute/
+│       └── PlanRoute.jsx
 │   ├── Courier/
+│       └── Courier.jsx
 │   ├── Fleet/
+│       └── Fleet.jsx
 │   ├── Notification/
+│       └── Notification.jsx
 │   ├── Finance/
+│       └── Finance.jsx
 │   ├── Driver/
+│       └── Driver.jsx
 │   ├── Report/
+│       └── Report.jsx
 │   ├── Support/
+│       └── Support.jsx
 │   └── Auth/
 │       ├── Login.jsx
 │       └── ForgotPassword.jsx
