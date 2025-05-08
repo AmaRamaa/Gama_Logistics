@@ -1,0 +1,19 @@
+const fetchingWaypoints = async () => {
+            const { data, error } = await supabase.from('Routes').select('*').limit(1); 
+            if (data) {
+                const fetchedWaypoints = data.map((route) => {
+                    const [startLat, startLng] = JSON.parse(route.start_point.replace(/'/g, '"'));
+                    const [endLat, endLng] = JSON.parse(route.end_point.replace(/'/g, '"'));
+                    return [
+                        { lat: startLat, lng: startLng },
+                        { lat: endLat, lng: endLng },
+                    ];
+                }).flat();    
+                setWaypoints(fetchedWaypoints);
+                console.log('Waypoints fetched:', fetchedWaypoints);
+            }
+            if (error) {
+                console.error('Error fetching waypoints:', error);
+            }
+        };
+        fetchingWaypoints();

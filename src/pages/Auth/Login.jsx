@@ -12,7 +12,6 @@ const Login = () => {
 
   React.useEffect(() => {
     document.body.style.backgroundColor = 'teal';
-    document.body.style.backgroundImage = 'url(https://via.placeholder.com/1920x1080)';
     return () => {
       document.body.style.backgroundColor = '';
       document.body.style.backgroundImage = '';

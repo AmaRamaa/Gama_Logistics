@@ -87,7 +87,7 @@ const AppRoutes = () => {
     return (
         <Router>
             <Suspense fallback={
-                <div className="d-flex justify-content-center align-items-center vh-100">
+                <div  className="d-flex justify-content-center align-items-center vh-100">
                     <DotLottieReact
                         src="https://lottie.host/d1978416-f80a-4f61-9aeb-d45248747fcc/71mHxPhcAZ.lottie"
                         loop
