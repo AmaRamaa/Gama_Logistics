@@ -4,27 +4,52 @@ import { supabase } from '../supaBase/supaBase';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-const Topbar = ({ topAtribute }) => {
-    const [user, setUser] = useState(null);
-    const [activeHeader, setActiveHeader] = useState('');
+const Topbar = ({ topAtribute = [] }) => {
+    const [user, setUser] = useState(null); // Used for user authentication and display
     const { pathname } = useLocation();
+    const [activeHeader, setActiveHeader] = useState(null); // Tracks the active header for styling
     const navigate = useNavigate();
 
-    // Extract base path like '/dashboard'
     const basePath = `/${pathname.split('/')[1]}`;
 
     useEffect(() => {
+        const fetchUserDetails = async (email) => {
+            const { data: userDetails, error } = await supabase
+                .from('Users')
+                .select('*')
+                .eq('email', email)
+                .single();
+
+            if (error) {
+                console.error('Error fetching user details:', error);
+            } else {
+                setUser(userDetails);
+            }
+        };
+
         const checkAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (session) setUser(session.user);
-            else window.location.href = '/login';
+            if (session) {
+                const email = session.user.email;
+
+                // Fetch user details based on email
+                await fetchUserDetails(email);
+            } else {
+                window.location.href = '/login';
+            }
         };
 
         checkAuth();
 
         const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-            if (session) setUser(session.user);
-            else window.location.href = '/login';
+            if (session) {
+                const email = session.user.email;
+
+                // Fetch user details based on email when session changes
+                fetchUserDetails(email);
+            } else {
+                window.location.href = '/login';
+            }
         });
 
         return () => {
@@ -32,48 +57,11 @@ const Topbar = ({ topAtribute }) => {
         };
     }, []);
 
-    // 1. Redirect to first tab only if subpath is missing (on mount)
-    useEffect(() => {
-        const currentSubPath = pathname.split('/')[2];
-        if (topAtribute.length > 0) {
-            const matched = topAtribute.find(attr =>
-                attr.toLowerCase().replace(/\s+/g, '-') === currentSubPath
-            );
-    
-            if (matched) {
-                setActiveHeader(matched);
-            } else {
-                // If no valid subpath, redirect to the first one
-                const defaultPath = `${basePath}/${topAtribute[0].toLowerCase().replace(/\s+/g, '-')}`;
-                navigate(defaultPath, { replace: true });
-            }
-        }
-    }, [pathname, topAtribute, navigate, basePath]);
-    
-
-    
-    // 2. Always update activeHeader based on URL
-    useEffect(() => {
-        const currentSubPath = pathname.split('/')[2];
-
-        if (topAtribute.length > 0 && currentSubPath) {
-            const matched = topAtribute.find(attr =>
-                attr.toLowerCase().replace(/\s+/g, '-') === currentSubPath
-            );
-            if (matched) {
-                setActiveHeader(matched);
-            }
-        }
-    }, [pathname, topAtribute]);
-
-
-
-
     const handleHeaderClick = (item) => {
+        setActiveHeader(item);
         const route = `${basePath}/${item.toLowerCase().replace(/\s+/g, '-')}`;
-        navigate(route); // Do NOT setActiveHeader here
+        navigate(route);
     };
-    
 
     return (
         <div className="d-flex justify-content-between align-items-center bg-white px-4 border-bottom shadow-sm" style={{ height: '60px' }}>
@@ -85,8 +73,8 @@ const Topbar = ({ topAtribute }) => {
                         onClick={() => handleHeaderClick(item)}
                         className={
                             activeHeader === item
-                                ? 'text-success fw-bold border-bottom border-3 border-success pb-2 text-decoration-none'
-                                : 'text-dark text-decoration-none'
+                                ? 'text-dark text-decoration-none'
+                                : ''
                         }
                         style={{ paddingTop: '30px', cursor: 'pointer' }}
                     >
@@ -102,7 +90,7 @@ const Topbar = ({ topAtribute }) => {
                 </i>
 
                 <img
-                    src={user?.user_metadata?.avatar_url || "https://via.placeholder.com/32"}
+                    src={user?.avatar_url}
                     alt="User"
                     className="rounded-circle"
                     width="32"
@@ -120,9 +108,13 @@ const Topbar = ({ topAtribute }) => {
 
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                     <li><NavLink to="/profile" className="dropdown-item">Profile</NavLink></li>
-                    <div style={{ textAlign: "center" }}>
-                        <h4 style={{ color: "grey", fontSize: "10px" }}>{user?.email || 'No Email Available'}</h4>
-                    </div>
+                    <li style={{ textAlign: "left", paddingLeft: "14px", Left: "14px" }}>
+                        <h4 className="dropdown" style={{ padding: "3px", fontSize: "12px", }}>{user?.name}</h4>
+                    </li>
+                    <li style={{ textAlign: "left", paddingLeft: "14px", Left: "14px" }}>
+                        <h4 className="dropdown" style={{ padding: "3px", fontSize: "12px", }}>{user?.email || 'No Email Available'}</h4>
+                    </li>
+
                     <li><hr className="dropdown-divider" /></li>
                     <li><NavLink to="/settings" className="dropdown-item">Settings</NavLink></li>
                     <li><NavLink to="/support" className="dropdown-item">Support</NavLink></li>
