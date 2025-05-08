@@ -61,7 +61,7 @@ const RoutingMachine = ({ waypoints }) => {
 const LiveMap = () => {
     const [waypoints, setWaypoints] = useState([
         { lat: 51.505, lng: -0.09 },
-        { lat: 51.51, lng: -0.1 },
+        { lat: 42.6026, lng: 20.9030},
     ]);
 
     const handleMarkerDrag = (index, event) => {
