@@ -7,7 +7,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 const Topbar = ({ topAtribute = [] }) => {
     const [user, setUser] = useState(null); // Used for user authentication and display
     const { pathname } = useLocation();
-    const [activeHeader, setActiveHeader] = useState(null); // Tracks the active header for styling
+    const [activeHeader, setActiveHeader] = useState(topAtribute[0]); // Tracks the active header for styling
     const navigate = useNavigate();
 
     const basePath = `/${pathname.split('/')[1]}`;
@@ -57,6 +57,16 @@ const Topbar = ({ topAtribute = [] }) => {
         };
     }, []);
 
+    useEffect(() => {
+        // Update activeHeader based on the current pathname
+        const currentHeader = topAtribute.find(item =>
+            pathname.toLowerCase().includes(item.toLowerCase().replace(/\s+/g, '-'))
+        );
+        if (currentHeader) {
+            setActiveHeader(currentHeader);
+        }
+    }, [pathname, topAtribute]);
+
     const handleHeaderClick = (item) => {
         setActiveHeader(item);
         const route = `${basePath}/${item.toLowerCase().replace(/\s+/g, '-')}`;
@@ -73,8 +83,8 @@ const Topbar = ({ topAtribute = [] }) => {
                         onClick={() => handleHeaderClick(item)}
                         className={
                             activeHeader === item
-                                ? 'text-dark text-decoration-none'
-                                : ''
+                                ? 'text-primary text-decoration-underline fw-semibold'
+                                : 'text-dark'
                         }
                         style={{ paddingTop: '30px', cursor: 'pointer' }}
                     >
