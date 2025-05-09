@@ -5,7 +5,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 const Sidebar = () => {
   const menu = [
     { name: 'Dashboard', icon: 'bi-grid', path: '/dashboard' },
-    { name: 'Courier', icon: 'bi-truck', path: '/courier' },
     { name: 'Fleet', icon: 'bi-truck-front', path: '/fleet' },
     { name: 'Plan Route', icon: 'bi-geo-alt', path: '/plan-route' },
     { name: 'Notification', icon: 'bi-bell', path: '/notification' },

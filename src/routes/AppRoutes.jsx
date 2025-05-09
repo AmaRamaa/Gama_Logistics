@@ -8,7 +8,6 @@ import { supabase } from '../supaBase/supaBase';
 // Lazy loaded pages
 const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
 const PlanRoute = lazy(() => import('../pages/PlanRoute/PlanRoute'));
-const Courier = lazy(() => import('../pages/Courier/Courier'));
 const Fleet = lazy(() => import('../pages/Fleet/Fleet'));
 const Notification = lazy(() => import('../pages/Notification/Notification'));
 const Finance = lazy(() => import('../pages/Finance/Finance'));
@@ -17,12 +16,13 @@ const Report = lazy(() => import('../pages/Report/Report'));
 const Support = lazy(() => import('../pages/Support/Support'));
 const Login = lazy(() => import('../pages/Auth/Login'));
 const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
+const Vehicles = lazy(() => import('../pages/Vehicles/Vehicle')); // Corrected path to match the file name
+
 
 const topbarAttributesMap = {
     '/dashboard': ['Summary', 'Live Map', 'Recent', 'Notifications'],
     '/plan-route': ['North', 'South', 'East', 'West'],
-    '/courier': ['Express', 'Standard', 'Same-Day'],
-    '/fleet': ['Available', 'In Maintenance', 'In Use'],
+    '/fleet': ['Available', 'In Maintenance', 'Use'],
     '/notification': ['Unread', 'All', 'System'],
     '/finance': ['Invoices', 'Payments', 'Refunds'],
     '/driver': ['Active', 'Idle', 'Unavailable'],
@@ -115,11 +115,11 @@ const AppRoutes = () => {
                                     <Route path="/plan-route" element={<PlanRoute />} />
                                     <Route path="/plan-route/:topbarAttributes" element={<PlanRoute />} />
 
-                                    <Route path="/courier" element={<Courier />} />
-                                    <Route path="/courier/:topbarAttributes" element={<Courier />} />
-
                                     <Route path="/fleet" element={<Fleet />} />
                                     <Route path="/fleet/:topbarAttributes" element={<Fleet />} />
+
+                                    <Route path="/vehicle" element={<Vehicles />} />
+                                    <Route path="/vehicle/:id" element={<Vehicles />} />
 
                                     <Route path="/notification" element={<Notification />} />
                                     <Route path="/notification/:topbarAttributes" element={<Notification />} />

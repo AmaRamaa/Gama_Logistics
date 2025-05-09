@@ -1,25 +1,60 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
+import { supabase } from "../../supaBase/supaBase";
+import { Link } from "react-router-dom";
 
-const Use = () => {
+const AvailableVehicles = () => {
+    const [vehicles, setVehicles] = useState([]);
+
+    useEffect(() => {
+        const fetchAvailableVehicles = async () => {
+            const { data, error } = await supabase
+                .from("Vehicles") // Replace with your table name
+                .select("*")
+                .eq("status", "available"); // Filter for available vehicles
+
+            if (error) {
+                console.error("Error fetching vehicles:", error);
+            } else {
+                setVehicles(data);
+            }
+        };
+
+        fetchAvailableVehicles();
+    }, []);
+
     return (
         <div className="container mt-5">
-            <h1 className="text-center mb-4">Fleet in Use</h1>
-            <div className="d-flex flex-column align-items-center">
-                <img
-                    src="https://as2.ftcdn.net/jpg/05/40/76/61/1000_F_540766172_9BreB2fWcDCPpdArO95n5zGB537lWjdN.jpg" // Replace with your truck image path
-                    alt="Transparent Truck"
-                    className="img-fluid mb-3"
-                    style={{ maxWidth: "300px" }} // Optional inline styling
-                />
-                <div className="text-center">
-                    <p>Item 1</p>
-                    <p>Item 2</p>
-                    <p>Item 3</p>
-                </div>
+            <h1 className="text-center mb-4">Available Vehicles</h1>
+            <div className="row">
+                {vehicles.length > 0 ? (
+                    vehicles.map((vehicle) => (
+                        <div className="col-md-4 mb-4" key={vehicle.id}>
+                            <div className="card">
+                                <div className="card-body">
+                                    <h5 className="card-title">{vehicle.model}</h5>
+                                    <p className="card-text">
+                                        License Plate: {vehicle.license_plate}
+                                    </p>
+                                    <p className="card-text">
+                                        Capacity: {vehicle.capacity}
+                                    </p>
+                                    <Link
+                                        to={`/vehicle/${vehicle.id}`}
+                                        className="btn btn-primary"
+                                    >
+                                        View Details
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-center">No available vehicles found.</p>
+                )}
             </div>
         </div>
     );
 };
 
-export default Use;
+export default AvailableVehicles;

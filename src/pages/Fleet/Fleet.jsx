@@ -5,15 +5,15 @@ import InUse from './Use';
 import Maintenance from './Maintenance';
 
 const Fleet = () => {
-  const { fleetStatus } = useParams();
+  const { topbarAttributes } = useParams();
 
-  const renderFleetComponent = () => {
-    switch (fleetStatus) {
+  const renderSubComponent = () => {
+    switch (topbarAttributes) {
       case 'available':
         return <Available />;
-      case 'in-use':
+      case 'use':
         return <InUse />;
-      case 'maintenance':
+      case 'in-maintenance':
         return <Maintenance />;
       default:
         return <InUse />;
@@ -23,7 +23,7 @@ const Fleet = () => {
   return (
     <div className="container-fluid py-4">
       <h2 className="mb-4 text-muted">Fleet</h2>
-      {renderFleetComponent()}
+      {renderSubComponent()}
     </div>
   );
 };

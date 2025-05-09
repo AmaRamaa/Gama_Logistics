@@ -5,13 +5,39 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Topbar = ({ topAtribute = [] }) => {
-    const [user, setUser] = useState(null); // Used for user authentication and display
+    const [user, setUser] = useState(null);
     const { pathname } = useLocation();
-    const [activeHeader, setActiveHeader] = useState(topAtribute[0]); // Tracks the active header for styling
     const navigate = useNavigate();
 
     const basePath = `/${pathname.split('/')[1]}`;
 
+    // 🔁 Set active header based on URL or redirect if needed
+    useEffect(() => {
+        if (topAtribute.length === 0) return;
+
+        const currentSubPath = pathname.split('/')[2];
+        const formatted = (str) => str.toLowerCase().replace(/\s+/g, '-');
+
+        if (!currentSubPath) {
+            // 🔁 Redirect to first top attribute on empty subpath
+            navigate(`${basePath}/${formatted(topAtribute[0])}`, { replace: true });
+        }
+    }, [pathname, topAtribute, navigate, basePath]);
+
+    const [activeHeader, setActiveHeader] = useState('');
+
+    // ✅ Sync activeHeader with URL changes
+    useEffect(() => {
+        const subPath = pathname.split('/')[2];
+        const matched = topAtribute.find(attr =>
+            pathname.toLowerCase().includes(attr.toLowerCase().replace(/\s+/g, '-'))
+        );
+        if (matched) {
+            setActiveHeader(matched);
+        }
+    }, [pathname, topAtribute]);
+
+    // 🔐 Fetch user data
     useEffect(() => {
         const fetchUserDetails = async (email) => {
             const { data: userDetails, error } = await supabase
@@ -20,20 +46,14 @@ const Topbar = ({ topAtribute = [] }) => {
                 .eq('email', email)
                 .single();
 
-            if (error) {
-                console.error('Error fetching user details:', error);
-            } else {
-                setUser(userDetails);
-            }
+            if (error) console.error('Error fetching user details:', error);
+            else setUser(userDetails);
         };
 
         const checkAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                const email = session.user.email;
-
-                // Fetch user details based on email
-                await fetchUserDetails(email);
+                await fetchUserDetails(session.user.email);
             } else {
                 window.location.href = '/login';
             }
@@ -42,14 +62,8 @@ const Topbar = ({ topAtribute = [] }) => {
         checkAuth();
 
         const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-            if (session) {
-                const email = session.user.email;
-
-                // Fetch user details based on email when session changes
-                fetchUserDetails(email);
-            } else {
-                window.location.href = '/login';
-            }
+            if (session) fetchUserDetails(session.user.email);
+            else window.location.href = '/login';
         });
 
         return () => {
@@ -57,20 +71,10 @@ const Topbar = ({ topAtribute = [] }) => {
         };
     }, []);
 
-    useEffect(() => {
-        // Update activeHeader based on the current pathname
-        const currentHeader = topAtribute.find(item =>
-            pathname.toLowerCase().includes(item.toLowerCase().replace(/\s+/g, '-'))
-        );
-        if (currentHeader) {
-            setActiveHeader(currentHeader);
-        }
-    }, [pathname, topAtribute]);
-
     const handleHeaderClick = (item) => {
+        const slug = item.toLowerCase().replace(/\s+/g, '-');
         setActiveHeader(item);
-        const route = `${basePath}/${item.toLowerCase().replace(/\s+/g, '-')}`;
-        navigate(route);
+        navigate(`${basePath}/${slug}`);
     };
 
     return (
@@ -100,12 +104,13 @@ const Topbar = ({ topAtribute = [] }) => {
                 </i>
 
                 <img
-                    src={user?.avatar_url}
+                    src={user?.avatar_url || "https://via.placeholder.com/32"}
                     alt="User"
                     className="rounded-circle"
                     width="32"
                     height="32"
                 />
+
                 <span
                     className="fw-semibold"
                     role="button"
@@ -118,13 +123,10 @@ const Topbar = ({ topAtribute = [] }) => {
 
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                     <li><NavLink to="/profile" className="dropdown-item">Profile</NavLink></li>
-                    <li style={{ textAlign: "left", paddingLeft: "14px", Left: "14px" }}>
-                        <h4 className="dropdown" style={{ padding: "3px", fontSize: "12px", }}>{user?.name}</h4>
+                    <li className="px-3">
+                        <h6 className="mb-0" style={{ fontSize: '13px' }}>{user?.name}</h6>
+                        <p className="text-muted mb-0" style={{ fontSize: '12px' }}>{user?.email || 'No Email'}</p>
                     </li>
-                    <li style={{ textAlign: "left", paddingLeft: "14px", Left: "14px" }}>
-                        <h4 className="dropdown" style={{ padding: "3px", fontSize: "12px", }}>{user?.email || 'No Email Available'}</h4>
-                    </li>
-
                     <li><hr className="dropdown-divider" /></li>
                     <li><NavLink to="/settings" className="dropdown-item">Settings</NavLink></li>
                     <li><NavLink to="/support" className="dropdown-item">Support</NavLink></li>
