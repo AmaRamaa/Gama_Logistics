@@ -28,6 +28,7 @@ const topbarAttributesMap = {
     '/driver': ['Active', 'Idle', 'Unavailable'],
     '/report': ['Daily', 'Weekly', 'Monthly'],
     '/support': ['Open Tickets', 'Closed Tickets'],
+    '/vehicle': ['Go Back'],
 };
 
 const LayoutWithTopbar = ({ children }) => {
@@ -87,7 +88,7 @@ const AppRoutes = () => {
     return (
         <Router>
             <Suspense fallback={
-                <div  className="d-flex justify-content-center align-items-center vh-100">
+                <div className="d-flex justify-content-center align-items-center vh-100">
                     <DotLottieReact
                         src="https://lottie.host/d1978416-f80a-4f61-9aeb-d45248747fcc/71mHxPhcAZ.lottie"
                         loop
@@ -107,8 +108,6 @@ const AppRoutes = () => {
                             <LayoutWithTopbar>
                                 <Routes>
                                     <Route path="/" element={<Navigate to="/dashboard" />} />
-                                    
-                                    {/* Pages with Subcategories */}
                                     <Route path="/dashboard" element={<Dashboard />} />
                                     <Route path="/dashboard/:topbarAttributes" element={<Dashboard />} />
 
@@ -120,6 +119,7 @@ const AppRoutes = () => {
 
                                     <Route path="/vehicle" element={<Vehicles />} />
                                     <Route path="/vehicle/:id" element={<Vehicles />} />
+                                    <Route path="/vehicle/go-back" element={<Navigate to="/fleet" />} />
 
                                     <Route path="/notification" element={<Notification />} />
                                     <Route path="/notification/:topbarAttributes" element={<Notification />} />
@@ -136,7 +136,6 @@ const AppRoutes = () => {
                                     <Route path="/support" element={<Support />} />
                                     <Route path="/support/:topbarAttributes" element={<Support />} />
 
-                                    {/* Catch-all */}
                                     <Route path="*" element={<div><h1>404 - Page Not Found</h1></div>} />
                                 </Routes>
                             </LayoutWithTopbar>

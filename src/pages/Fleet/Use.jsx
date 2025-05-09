@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import { supabase } from "../../supaBase/supaBase";
 import { Link } from "react-router-dom";
+import Maintenance from "./Maintenance"; // Import the Maintenance component
 
 const AvailableVehicles = () => {
     const [vehicles, setVehicles] = useState([]);
@@ -25,7 +26,7 @@ const AvailableVehicles = () => {
 
     return (
         <div className="container mt-5">
-            <h1 className="text-center mb-4">Vehicles  in Use</h1>
+            <h1 className="text-center mb-4">Vehicles in Use</h1>
             <div className="row">
                 {vehicles.length > 0 ? (
                     vehicles.map((vehicle) => (

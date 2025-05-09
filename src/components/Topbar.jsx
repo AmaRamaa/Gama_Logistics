@@ -6,6 +6,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Topbar = ({ topAtribute = [] }) => {
     const [user, setUser] = useState(null);
+    const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
     const { pathname } = useLocation();
     const navigate = useNavigate();
 
@@ -19,7 +20,6 @@ const Topbar = ({ topAtribute = [] }) => {
         const formatted = (str) => str.toLowerCase().replace(/\s+/g, '-');
 
         if (!currentSubPath) {
-            // 🔁 Redirect to first top attribute on empty subpath
             navigate(`${basePath}/${formatted(topAtribute[0])}`, { replace: true });
         }
     }, [pathname, topAtribute, navigate, basePath]);
@@ -71,6 +71,28 @@ const Topbar = ({ topAtribute = [] }) => {
         };
     }, []);
 
+    // 🔔 Fetch notifications and check for unread ones
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                const { data: notifications, error } = await supabase
+                    .from('Notifications')
+                    .select('*')
+                    .eq('status', 'unread'); // Assuming 'status' indicates read/unread
+
+                if (error) {
+                    throw error;
+                }
+
+                setHasUnreadNotifications(notifications.length > 0);
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        };
+
+        fetchNotifications();
+    }, []);
+
     const handleHeaderClick = (item) => {
         const slug = item.toLowerCase().replace(/\s+/g, '-');
         setActiveHeader(item);
@@ -78,7 +100,10 @@ const Topbar = ({ topAtribute = [] }) => {
     };
 
     return (
-        <div className="d-flex justify-content-between align-items-center bg-white px-4 border-bottom shadow-sm" style={{ height: '60px' }}>
+        <div
+            className="d-flex justify-content-between align-items-center bg-white px-4 border-bottom shadow-sm position-sticky top-0"
+            style={{ height: '60px', zIndex: 1030 }}
+        >
             {/* Subcategory links */}
             <div className="d-flex gap-4">
                 {topAtribute.map((item, idx) => (
@@ -97,10 +122,15 @@ const Topbar = ({ topAtribute = [] }) => {
                 ))}
             </div>
 
-            {/* User actions and bell */}
             <div className="d-flex align-items-center gap-4 position-relative">
-                <i className="bi bi-bell fs-5 position-relative" role="button">
-                    <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style={{ width: '8px', height: '8px' }}></span>
+                <i
+                    className="bi bi-bell fs-5 position-relative"
+                    role="button"
+                    onClick={() => navigate('/notification/unread')}
+                >
+                    {hasUnreadNotifications && (
+                        <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style={{ width: '8px', height: '8px' }}></span>
+                    )}
                 </i>
 
                 <img
@@ -122,8 +152,8 @@ const Topbar = ({ topAtribute = [] }) => {
                 </span>
 
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><NavLink to="/profile" className="dropdown-item">Profile</NavLink></li>
-                    <li className="px-3">
+                    <li><NavLink to="/profile" className="dropdown-item">Profile</NavLink>
+                    <li className="px-3"></li>
                         <h6 className="mb-0" style={{ fontSize: '13px' }}>{user?.name}</h6>
                         <p className="text-muted mb-0" style={{ fontSize: '12px' }}>{user?.email || 'No Email'}</p>
                     </li>

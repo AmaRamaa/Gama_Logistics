@@ -1,12 +1,34 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+import Unread from './Unread';
+import All from './All';
+import System from './System';
 
-const Driver = () => {
+const Notification = () => {
+  const { topbarAttributes } = useParams();
+  const attribute = topbarAttributes ? String(topbarAttributes) : '';
+
+    // Removed redundant switch statement
+
+  const renderSubComponent = () => {
+    switch (attribute) {
+      case 'unread':
+        return <Unread />;
+      case 'all':
+        return <All />;
+      case 'system':
+        return <System />;
+      default:
+        return <Unread />;
+    }
+  };
+
   return (
-    <div>
-      <h1>Placeholder</h1>
-      <p>This page is for managing driver profiles, ratings, reviews, and service logs.</p>
+    <div className="container-fluid py-4">
+      <h2 className="mb-4 text-muted">Notification</h2>
+      {renderSubComponent()}
     </div>
   );
 };
 
-export default Driver;
+export default Notification;
