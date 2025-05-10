@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
@@ -17,7 +17,7 @@ const Support = lazy(() => import('../pages/Support/Support'));
 const Login = lazy(() => import('../pages/Auth/Login'));
 const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
 const Vehicles = lazy(() => import('../pages/Vehicles/Vehicle')); // Corrected path to match the file name
-
+const Settings = lazy(() => import('../pages/Settings/Settings'));
 
 const topbarAttributesMap = {
     '/dashboard': ['Summary', 'Live Map', 'Recent', 'Notifications'],
@@ -29,6 +29,7 @@ const topbarAttributesMap = {
     '/report': ['Daily', 'Weekly', 'Monthly'],
     '/support': ['Open Tickets', 'Closed Tickets'],
     '/vehicle': ['Go Back'],
+    '/settings': ['Profile', 'Security', 'Display', 'Language'],
 };
 
 const LayoutWithTopbar = ({ children }) => {
@@ -52,20 +53,20 @@ const ProtectedRoute = ({ children }) => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setIsAuthenticated(!!session);
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession() || { data: { session: null }, error: null };
+                if (error) throw error;
+                setIsAuthenticated(!!session);
 
-            if (!session) window.location.href = '/login';
+                if (!session) window.location.href = '/login';
+            } catch (err) {
+                console.error('Error fetching session:', err);
+                setIsAuthenticated(false);
+                window.location.href = '/login';
+            }
         };
 
         checkAuth();
-
-        const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-            setIsAuthenticated(!!session);
-            if (!session) window.location.href = '/login';
-        });
-
-        return () => authListener?.subscription.unsubscribe();
     }, []);
 
     if (isAuthenticated === null) {
@@ -84,10 +85,10 @@ const ProtectedRoute = ({ children }) => {
     return children;
 };
 
-const AppRoutes = () => {
-    return (
-        <Router>
-            <Suspense fallback={
+const AppRoutes = () => (
+    <Router>
+        <Suspense
+            fallback={
                 <div className="d-flex justify-content-center align-items-center vh-100">
                     <DotLottieReact
                         src="https://lottie.host/d1978416-f80a-4f61-9aeb-d45248747fcc/71mHxPhcAZ.lottie"
@@ -96,55 +97,56 @@ const AppRoutes = () => {
                         style={{ width: '40%', height: '40%' }}
                     />
                 </div>
-            }>
-                <Routes>
-                    {/* Public Routes */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-
-                    {/* Protected Layout */}
-                    <Route path="*" element={
+            }
+        >
+            <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                    path="/*"
+                    element={
                         <ProtectedRoute>
                             <LayoutWithTopbar>
                                 <Routes>
                                     <Route path="/" element={<Navigate to="/dashboard" />} />
                                     <Route path="/dashboard" element={<Dashboard />} />
-                                    <Route path="/dashboard/:topbarAttributes" element={<Dashboard />} />
-
+                                    <Route path="/dashboard/:topbarAttributes" element={<Dashboard />} key="dashboard" />
+            
                                     <Route path="/plan-route" element={<PlanRoute />} />
                                     <Route path="/plan-route/:topbarAttributes" element={<PlanRoute />} />
-
+            
                                     <Route path="/fleet" element={<Fleet />} />
                                     <Route path="/fleet/:topbarAttributes" element={<Fleet />} />
-
+            
                                     <Route path="/vehicle" element={<Vehicles />} />
                                     <Route path="/vehicle/:id" element={<Vehicles />} />
-                                    <Route path="/vehicle/go-back" element={<Navigate to="/fleet" />} />
-
+                                    <Route path="/vehicle/go-back" element={<Navigate to="/fleet" replace />} />
+            
                                     <Route path="/notification" element={<Notification />} />
                                     <Route path="/notification/:topbarAttributes" element={<Notification />} />
-
+            
                                     <Route path="/finance" element={<Finance />} />
                                     <Route path="/finance/:topbarAttributes" element={<Finance />} />
-
+            
                                     <Route path="/driver" element={<Driver />} />
                                     <Route path="/driver/:topbarAttributes" element={<Driver />} />
-
+            
                                     <Route path="/report" element={<Report />} />
                                     <Route path="/report/:topbarAttributes" element={<Report />} />
-
+            
+                                    <Route path="/settings" element={<Settings />} />
+                                    <Route path="/settings/:topbarAttributes" element={<Settings />} />
+            
                                     <Route path="/support" element={<Support />} />
                                     <Route path="/support/:topbarAttributes" element={<Support />} />
-
-                                    <Route path="*" element={<div><h1>404 - Page Not Found</h1></div>} />
                                 </Routes>
                             </LayoutWithTopbar>
                         </ProtectedRoute>
-                    } />
-                </Routes>
-            </Suspense>
-        </Router>
-    );
-};
+                    }
+                />
+            </Routes>
+        </Suspense>
+    </Router>
+);
 
 export default AppRoutes;
