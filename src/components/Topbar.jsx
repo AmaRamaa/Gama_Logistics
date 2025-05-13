@@ -106,20 +106,52 @@ const Topbar = ({ topAtribute = [] }) => {
         >
             {/* Subcategory links */}
             <div className="d-flex gap-4">
-                {topAtribute.map((item, idx) => (
-                    <span
-                        key={idx}
-                        onClick={() => handleHeaderClick(item)}
-                        className={
-                            activeHeader === item
-                                ? 'text-primary text-decoration-underline fw-semibold'
-                                : 'text-dark'
-                        }
-                        style={{ paddingTop: '30px', cursor: 'pointer' }}
-                    >
-                        {item.toUpperCase()}
-                    </span>
-                ))}
+                {navigator.userAgent.includes('iPhone') ? (
+                    <div className="dropdown">
+                        <span
+                            className="text-dark dropdown-toggle"
+                            role="button"
+                            id="subcategoryDropdown"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            style={{ paddingTop: '30px', cursor: 'pointer' }}
+                        >
+                            Subcategories
+                        </span>
+                        <ul className="dropdown-menu" aria-labelledby="subcategoryDropdown">
+                            {topAtribute.map((item, idx) => (
+                                <li key={idx}>
+                                    <span
+                                        onClick={() => handleHeaderClick(item)}
+                                        className={
+                                            activeHeader === item
+                                                ? 'dropdown-item text-primary fw-semibold'
+                                                : 'dropdown-item text-dark'
+                                        }
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {item.toUpperCase()}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    topAtribute.map((item, idx) => (
+                        <span
+                            key={idx}
+                            onClick={() => handleHeaderClick(item)}
+                            className={
+                                activeHeader === item
+                                    ? 'text-primary text-decoration-underline fw-semibold'
+                                    : 'text-dark'
+                            }
+                            style={{ paddingTop: '30px', cursor: 'pointer' }}
+                        >
+                            {item.toUpperCase()}
+                        </span>
+                    ))
+                )}
             </div>
 
             <div className="d-flex align-items-center gap-4 position-relative">
