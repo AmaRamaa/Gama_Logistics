@@ -4,6 +4,8 @@ import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { supabase } from '../supaBase/supaBase';
+import ErrorConsoleListener from '../supaBase/supaBaseLogic';
+
 
 // Lazy loaded pages
 const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
@@ -128,6 +130,7 @@ const ProtectedRoute = ({ children, allowMobile = false, mobileOnly = false }) =
 
 const AppRoutes = () => (
     <Router>
+        <ErrorConsoleListener />
         <Suspense>
             <Routes>
                 {/* Public Routes */}

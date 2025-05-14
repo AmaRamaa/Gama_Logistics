@@ -36,8 +36,31 @@ const SystemNotifications = () => {
                         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                     }}
                 >
-                    <h3 style={{ margin: "0 0 8px 0" }}>{notification.message}</h3>
-                    <p style={{ margin: "0 0 8px 0", color: "#555" }}>
+                    <h3
+                        style={{
+                            margin: "0 0 10px 0",
+                            whiteSpace: "warp",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: "100%",
+                            display: "block",
+                        }}
+                        title={notification.message}
+                    >
+                        {notification.message}
+                    </h3>
+                    <p
+                        style={{
+                            margin: "0 0 8px 0",
+                            color: "#555",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: "100%",
+                            display: "block",
+                        }}
+                        title={notification.status}
+                    >
                         <strong>Status:</strong> {notification.status}
                     </p>
                     <p style={{ margin: "0", color: "#888" }}>

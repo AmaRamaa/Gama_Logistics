@@ -1,47 +1,54 @@
-// import { createClient } from '@supabase/supabase-js';
-// import { supabase } from './supaBase';  
+import { useEffect, useState } from 'react';
+import { supabase } from './supaBase'; // Update this import path
 
+const ErrorConsoleListener = () => {
+    const [errors, setErrors] = useState([]);
 
-// // Initialize Supabase client
+    // Helper to send error to Supabase
+    const sendErrorToSupabase = async (message) => {
+        await supabase.from('Notifications').insert([
+            {
+                user_id: null, // Set this if you have a user context
+                message,
+                status: 'unread',
+                created_at: new Date().toISOString(),
+            }
+        ]);
+    };
 
+    useEffect(() => {
+        const handleError = (event) => {
+            const msg = `Error: ${event.message} at ${event.filename}:${event.lineno}:${event.colno}`;
+            setErrors(prev => [...prev, msg]);
+            sendErrorToSupabase(msg);
+        };
 
-// // Function to listen for new user signups and add them to the Users table
-// const listenForAuthChanges = async () => {
-//     supabase.auth.onAuthStateChange(async (event, session) => {
-//         if (event === 'SIGNED_IN' && session?.user) {
-//             const { id, email } = session.user;
+        const handlePromiseRejection = (event) => {
+            const msg = `Unhandled Promise Rejection: ${event.reason}`;
+            setErrors(prev => [...prev, msg]);
+            sendErrorToSupabase(msg);
+        };
 
-//             // Check if the user already exists in the Users table
-//             const { data: existingUser, error: fetchError } = await supabase
-//             .from('Users')
-//             .select('*')
-//             .eq('id', id)
-//             .single();
+        window.addEventListener('error', handleError);
+        window.addEventListener('unhandledrejection', handlePromiseRejection);
 
-//             if (fetchError) {
-//             console.error('Error fetching user from Users table:', fetchError.message);
-//             return;
-//             }
+        return () => {
+            window.removeEventListener('error', handleError);
+            window.removeEventListener('unhandledrejection', handlePromiseRejection);
+        };
+        // eslint-disable-next-line
+    }, []);
 
-//             // If the user does not exist, insert them into the Users table
-//             if (!existingUser) {
-//             const { error: insertError } = await supabase.from('Users').insert([
-//                 { id, email },
-//             ]);
+    if (errors.length === 0) return null;
 
-//             if (insertError) {
-//                 console.error('Error inserting user into Users table:', insertError.message);
-//             } else {
-//                 console.log('User successfully added to Users table');
-//             }
-//             } else {
-//             console.log('User already exists in Users table');
-//             }
-//         }
-//     });
-// };
+    return (
+        <div style={{ backgroundColor: '#ffdddd', padding: '10px', border: '1px solid red' }}>
+            <h3>Console Errors Detected:</h3>
+            <ul>
+                {errors.map((err, index) => <li key={index}>{err}</li>)}
+            </ul>
+        </div>
+    );
+};
 
-// // Call the function to start listening for auth changes
-// listenForAuthChanges();
-
-// export default supabase;
+export default ErrorConsoleListener;
