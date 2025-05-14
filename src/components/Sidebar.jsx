@@ -10,7 +10,6 @@ const Sidebar = () => {
     { name: 'Notification', icon: 'bi-bell', path: '/notification' },
     { name: 'Finance', icon: 'bi-cash-stack', path: '/finance' },
     { name: 'Driver', icon: 'bi-person-badge', path: '/driver' },
-    { name: 'Report', icon: 'bi-bar-chart', path: '/report' },
     { name: 'Support', icon: 'bi-life-preserver', path: '/support' },
   ];
 
