@@ -12,7 +12,6 @@ const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
 const PlanRoute = lazy(() => import('../pages/PlanRoute/PlanRoute'));
 const Fleet = lazy(() => import('../pages/Fleet/Fleet'));
 const Notification = lazy(() => import('../pages/Notification/Notification'));
-const Finance = lazy(() => import('../pages/Finance/Finance'));
 const Driver = lazy(() => import('../pages/Driver/Driver'));
 const Report = lazy(() => import('../pages/Report/Report'));
 const Support = lazy(() => import('../pages/Support/Support'));
@@ -26,7 +25,6 @@ const topbarAttributesMap = {
     '/plan-route': ['North', 'South', 'East', 'West'],
     '/fleet': ['Available', 'In Maintenance', 'Use'],
     '/notification': ['Unread', 'All', 'System'],
-    '/finance': ['Invoices', 'Payments', 'Refunds'],
     '/driver': ['Active', 'Idle', 'Unavailable'],
     '/report': ['Daily', 'Weekly', 'Monthly'],
     '/support': ['Open Tickets', 'Closed Tickets'],
@@ -182,9 +180,6 @@ const AppRoutes = () => (
 
                                     <Route path="/notification" element={<Notification />} />
                                     <Route path="/notification/:topbarAttributes" element={<Notification />} />
-
-                                    <Route path="/finance" element={<Finance />} />
-                                    <Route path="/finance/:topbarAttributes" element={<Finance />} />
 
                                     <Route path="/driver" element={<Driver />} />
                                     <Route path="/driver/:topbarAttributes" element={<Driver />} />

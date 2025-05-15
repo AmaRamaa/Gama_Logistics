@@ -10,7 +10,7 @@ const ErrorConsoleListener = () => {
             {
                 user_id: null, // Set this if you have a user context
                 message,
-                status: 'unread',
+                status: 'system',
                 created_at: new Date().toISOString(),
             }
         ]);
@@ -41,14 +41,7 @@ const ErrorConsoleListener = () => {
 
     if (errors.length === 0) return null;
 
-    return (
-        <div style={{ backgroundColor: '#ffdddd', padding: '10px', border: '1px solid red' }}>
-            <h3>Console Errors Detected:</h3>
-            <ul>
-                {errors.map((err, index) => <li key={index}>{err}</li>)}
-            </ul>
-        </div>
-    );
+    return null
 };
 
 export default ErrorConsoleListener;
