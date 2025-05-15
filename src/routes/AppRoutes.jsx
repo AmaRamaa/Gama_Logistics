@@ -72,35 +72,35 @@ const ProtectedRoute = ({ children, allowMobile = false, mobileOnly = false }) =
     const location = useLocation();
     const onMobile = isMobile();
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const { data: { session }, error } = await supabase.auth.getSession() || { data: { session: null }, error: null };
-                if (error) throw error;
-                setIsAuthenticated(!!session);
+    // useEffect(() => {
+    //     const checkAuth = async () => {
+    //         try {
+    //             const { data: { session }, error } = await supabase.auth.getSession() || { data: { session: null }, error: null };
+    //             if (error) throw error;
+    //             setIsAuthenticated(!!session);
 
-                if (!session) window.location.href = '/login';
-            } catch (err) {
-                console.error('Error fetching session:', err);
-                setIsAuthenticated(false);
-                window.location.href = '/login';
-            }
-            const { data: { session } } = await supabase.auth.getSession();
-            setIsAuthenticated(!!session);
-            if (!session) window.location.href = '/login';
-        };
+    //             if (!session) window.location.href = '/login';
+    //         } catch (err) {
+    //             console.error('Error fetching session:', err);
+    //             setIsAuthenticated(false);
+    //             window.location.href = '/login';
+    //         }
+    //         const { data: { session } } = await supabase.auth.getSession();
+    //         setIsAuthenticated(!!session);
+    //         if (!session) window.location.href = '/login';
+    //     };
 
-        checkAuth();
+    //     checkAuth();
 
-        const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-            setIsAuthenticated(!!session);
-            if (!session) window.location.href = '/login';
-        });
+    //     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+    //         setIsAuthenticated(!!session);
+    //         if (!session) window.location.href = '/login';
+    //     });
 
-        checkAuth();
+    //     checkAuth();
 
-        return () => authListener?.subscription.unsubscribe();
-    }, []);
+    //     return () => authListener?.subscription.unsubscribe();
+    // }, []);
 
     if (isAuthenticated === null) {
         return (
