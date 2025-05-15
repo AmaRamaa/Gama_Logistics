@@ -50,25 +50,25 @@ const Topbar = ({ topAtribute = [] }) => {
             else setUser(userDetails);
         };
 
-        const checkAuth = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                await fetchUserDetails(session.user.email);
-            } else {
-                window.location.href = '/login';
-            }
-        };
+        // const checkAuth = async () => {
+        //     const { data: { session } } = await supabase.auth.getSession();
+        //     if (session) {
+        //         await fetchUserDetails(session.user.email);
+        //     } else {
+        //         window.location.href = '/login';
+        //     }
+        // };
 
-        checkAuth();
+        // checkAuth();
 
-        const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-            if (session) fetchUserDetails(session.user.email);
-            else window.location.href = '/login';
-        });
+        // const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+        //     if (session) fetchUserDetails(session.user.email);
+        //     else window.location.href = '/login';
+        // });
 
-        return () => {
-            authListener?.subscription.unsubscribe();
-        };
+        // return () => {
+        //     authListener?.subscription.unsubscribe();
+        // };
     }, []);
 
     // 🔔 Fetch notifications and check for unread ones
