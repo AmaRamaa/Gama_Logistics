@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { supabase } from '../../supaBase/supaBase'; // Adjust the import path as necessary
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../features/user/userSlice';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +11,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate(); // Move useNavigate to the top level
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     document.body.style.backgroundColor = 'teal';
@@ -19,19 +22,21 @@ const Login = () => {
   }, []);
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      navigate('/'); // Use navigate here
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    // Dispatch user info to Redux
+    dispatch(setUser(data.user));
+    navigate('/'); // Use navigate here
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}; // <-- Close handleLogin function here
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
