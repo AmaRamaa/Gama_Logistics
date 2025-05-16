@@ -8,9 +8,7 @@ const Sidebar = () => {
     { name: 'Fleet', icon: 'bi-truck-front', path: '/fleet' },
     { name: 'Plan Route', icon: 'bi-geo-alt', path: '/plan-route' },
     { name: 'Notification', icon: 'bi-bell', path: '/notification' },
-    { name: 'Finance', icon: 'bi-cash-stack', path: '/finance' },
     { name: 'Driver', icon: 'bi-person-badge', path: '/driver' },
-    { name: 'Support', icon: 'bi-life-preserver', path: '/support' },
   ];
 
   return (

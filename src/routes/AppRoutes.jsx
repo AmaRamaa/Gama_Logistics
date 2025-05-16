@@ -14,7 +14,6 @@ const Fleet = lazy(() => import('../pages/Fleet/Fleet'));
 const Notification = lazy(() => import('../pages/Notification/Notification'));
 const Driver = lazy(() => import('../pages/Driver/Driver'));
 const Report = lazy(() => import('../pages/Report/Report'));
-const Support = lazy(() => import('../pages/Support/Support'));
 const Login = lazy(() => import('../pages/Auth/Login'));
 const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
 const Settings = lazy(() => import('../pages/Settings/Settings'));
@@ -27,7 +26,6 @@ const topbarAttributesMap = {
     '/notification': ['Unread', 'All', 'System'],
     '/driver': ['Active', 'Idle', 'Unavailable'],
     '/report': ['Daily', 'Weekly', 'Monthly'],
-    '/support': ['Open Tickets', 'Closed Tickets'],
     '/vehicle': ['Go Back'],
     '/settings': ['Profile', 'Security', 'Display', 'Language'],
 };
@@ -183,9 +181,6 @@ const AppRoutes = () => (
 
                                     <Route path="/driver" element={<Driver />} />
                                     <Route path="/driver/:topbarAttributes" element={<Driver />} />
-
-                                    <Route path="/support" element={<Support />} />
-                                    <Route path="/support/:topbarAttributes" element={<Support />} />
 
                                     <Route path="/settings" element={<Settings />} />
                                     <Route path="/settings/:topbarAttributes" element={<Settings />} />
