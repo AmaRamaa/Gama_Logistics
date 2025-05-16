@@ -19,7 +19,7 @@ const ErrorConsoleListener = () => {
     useEffect(() => {
         const handleError = (event) => {
             const msg = `Error: ${event.message} at ${event.filename}:${event.lineno}:${event.colno}`;
-            setErrors(prev => [...prev, msg]);  
+            setErrors(prev => [...prev, msg]);
             sendErrorToSupabase(msg);
         };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { supabase } from "../../supaBase/supaBase";
 import { useParams } from "react-router-dom";
@@ -25,11 +25,43 @@ const truckIcon = new L.Icon({
     popupAnchor: [0, -35],
 });
 
+const MODEL_3D_MAP = {
+    "Ford Transit": {
+        title: "Ford Transit Cargo",
+        src: "https://sketchfab.com/models/97e42c17df95452093aceb7c8680b8b8/embed"
+    },
+    "Mercedes Sprinter": {
+        title: "Mercedes-Benz Sprinter",
+        src: "https://sketchfab.com/models/6d6427ecd66b4661b22a4644d48cec6a/embed"
+    },
+    "Renault Kangoo": {
+        title: "Renault Kangoo",
+        src: "https://sketchfab.com/models/863158c941d94475b4374579caae28dd/embed"
+    },
+    "Peugeot Boxer": {
+        title: "Peugeot Boxer",
+        src: "https://sketchfab.com/models/5b3cf1234ef14be59072464935501578/embed"
+    },
+    "Nissan NV200": {
+        title: "Nissan NV200",
+        src: "https://sketchfab.com/models/0f34caf6ffe64c8f8a999d5b07e86a64/embed"
+    },
+    "Volkswagen Crafter": {
+        title: "Volkswagen Crafter",
+        src: "https://sketchfab.com/models/ed06bddd8bc24654b1be023b3af5957d/embed"
+    },
+    "Citroën Jumper": {
+        title: "Citroën Jumper",
+        src: "https://sketchfab.com/models/1c2bf52273a941e0b102db6beb16b6b6/embed"
+    }
+};
+
+
 const VehicleDetails = () => {
     const { id } = useParams();
     const [vehicle, setVehicle] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [enable3D, setEnable3D] = useState(() => {
+    const [enable3D] = useState(() => {
         const storedValue = localStorage.getItem('enable3D');
         return storedValue !== null ? JSON.parse(storedValue) : true;
     });
@@ -114,83 +146,24 @@ const VehicleDetails = () => {
 
             {/* 3D Model */}
             {enable3D && (
-                <div className="mt-4">
-                    <h3 className="text-center mb-3">3D Vehicle Model</h3>
-                    <div className="sketchfab-embed-wrapper" style={{ width: "100%", height: "600px" }}>
-                        {vehicle.model === "Ford Transit" && (
-                            <iframe
-                                title="Ford Transit Cargo"
-                                allowFullScreen
-                                allow="autoplay; fullscreen; xr-spatial-tracking"
-                                src="https://sketchfab.com/models/97e42c17df95452093aceb7c8680b8b8/embed"
-                                style={{ width: "100%", height: "100%", border: "none" }}
-                            ></iframe>
-                        )}
-                        {vehicle.model === "Mercedes Sprinter" && (
-                            <iframe
-                                title="Mercedes-Benz Sprinter"
-                                allowFullScreen
-                                allow="autoplay; fullscreen; xr-spatial-tracking"
-                                src="https://sketchfab.com/models/6d6427ecd66b4661b22a4644d48cec6a/embed"
-                                style={{ width: "100%", height: "100%", border: "none" }}
-                            ></iframe>
-                        )}
-                        {vehicle.model === "Renault Kangoo" && (
-                            <iframe
-                                title="Renault Kangoo"
-                                allowFullScreen
-                                allow="autoplay; fullscreen; xr-spatial-tracking"
-                                src="https://sketchfab.com/models/863158c941d94475b4374579caae28dd/embed"
-                                style={{ width: "100%", height: "100%", border: "none" }}
-                            ></iframe>
-                        )}
-                        {vehicle.model === "Peugeot Boxer" && (
-                            <iframe
-                                title="Peugeot Boxer"
-                                allowFullScreen
-                                allow="autoplay; fullscreen; xr-spatial-tracking"
-                                src="https://sketchfab.com/models/5b3cf1234ef14be59072464935501578/embed"
-                                style={{ width: "100%", height: "100%", border: "none" }}
-                            ></iframe>
-                        )}
-                        {vehicle.model === "Nissan NV200" && (
-                            <iframe
-                                title="Nissan NV200"
-                                allowFullScreen
-                                allow="autoplay; fullscreen; xr-spatial-tracking"
-                                src="https://sketchfab.com/models/0f34caf6ffe64c8f8a999d5b07e86a64/embed"
-                                style={{ width: "100%", height: "100%", border: "none" }}
-                            ></iframe>
-                        )}
-                        {vehicle.model === "Volkswagen Crafter" && (
-                            <iframe
-                                title="Volkswagen Crafter"
-                                allowFullScreen
-                                allow="autoplay; fullscreen; xr-spatial-tracking"
-                                src="https://sketchfab.com/models/ed06bddd8bc24654b1be023b3af5957d/embed"
-                                style={{ width: "100%", height: "100%", border: "none" }}
-                            ></iframe>
-                        )}
-                        {vehicle.model === "Citroën Jumper" && (
-                            <iframe
-                                title="Citroën Jumper"
-                                allowFullScreen
-                                allow="autoplay; fullscreen; xr-spatial-tracking"
-                                src="https://sketchfab.com/models/1c2bf52273a941e0b102db6beb16b6b6/embed"
-                                style={{ width: "100%", height: "100%", border: "none" }}
-                            ></iframe>
-                        )}
-                        {![
-                            "Ford Transit",
-                            "Mercedes Sprinter",
-                            "Renault Kangoo",
-                            "Peugeot Boxer",
-                            "Nissan NV200",
-                            "Volkswagen Crafter",
-                            "Citroën Jumper"
-                        ].includes(vehicle.model) && (
-                                <p className="text-muted text-center">No 3D model available for this vehicle.</p>
+                <div className="card mt-4 shadow">
+                    <div className="card-body">
+                        <h3 className="card-title text-center mb-3">3D Vehicle Model</h3>
+                        <div style={{ width: "100%", height: "400px" }}>
+                            {MODEL_3D_MAP[vehicle.model] ? (
+                                <iframe
+                                    title={MODEL_3D_MAP[vehicle.model].title}
+                                    allowFullScreen
+                                    allow="autoplay; fullscreen; xr-spatial-tracking"
+                                    src={MODEL_3D_MAP[vehicle.model].src}
+                                    style={{ width: "100%", height: "100%", border: "none" }}
+                                ></iframe>
+                            ) : (
+                                <p className="text-center text-muted">
+                                    No 3D model available for this vehicle.
+                                </p>
                             )}
+                        </div>
                     </div>
                 </div>
             )}
