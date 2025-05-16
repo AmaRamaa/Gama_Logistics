@@ -47,7 +47,7 @@ const Profile = () => {
             <div className="card shadow-lg">
                 <div className="card-header text-center bg-primary text-white">
                     <img
-                        src={user.avatar_url || "https://via.placeholder.com/150"}
+                        src={user.avatar_url}
                         alt="Profile"
                         className="rounded-circle mb-3"
                         style={{ width: '150px', height: '150px' }}

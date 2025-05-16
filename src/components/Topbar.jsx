@@ -166,7 +166,7 @@ const Topbar = ({ topAtribute = [] }) => {
                 </i>
 
                 <img
-                    src={user?.avatar_url || "https://via.placeholder.com/32"}
+                    src={user?.avatar_url}
                     alt="User"
                     className="rounded-circle"
                     width="32"
