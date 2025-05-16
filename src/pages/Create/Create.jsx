@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Create from './Create';
+import Driver from './Driver';
 import User from './User';
 import Vehicle from './Vehicle';
 
@@ -52,8 +52,8 @@ const Create = () => {
 
   const renderSubComponent = () => {
     switch (attribute) {
-        case 'create':
-            return <Create />;
+        case 'driver':
+            return <Driver />;
         case 'user':
             return <User />;
         case 'vehicle':
