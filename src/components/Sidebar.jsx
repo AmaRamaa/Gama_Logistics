@@ -9,6 +9,7 @@ const Sidebar = () => {
     { name: 'Plan Route', icon: 'bi-geo-alt', path: '/plan-route' },
     { name: 'Notification', icon: 'bi-bell', path: '/notification' },
     { name: 'Driver', icon: 'bi-person-badge', path: '/driver' },
+    { name: 'Create', icon: 'bi-plus-circle', path: '/create' },
   ];
 
   return (
