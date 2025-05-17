@@ -1,94 +1,195 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../../supaBase/supaBase';
 
 const Daily = () => {
-    const [drivers, setDrivers] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [reports, setReports] = useState([]);
-    const [notifications, setNotifications] = useState([]);
+    const [form, setForm] = useState({
+        driverName: '',
+        car: '',
+        location: '',
+        gas: ''
+    });
+    const [loading, setLoading] = useState(false);
 
+    // Fetch current user and driver/vehicle info
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const { data: driversData, error: driversError } = await supabase.from('Drivers').select('*');
-                if (driversError) throw driversError;
-                setDrivers(driversData);
+        const fetchDriverName = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            console.log(user);
+            if (user) {
+                const { data: userData, error } = await supabase
+                    .from('Users')
+                    .select('name')
+                    .eq('email', user.email)
+                    .single();
+                if (!error && userData?.name) {
+                    setForm((prev) => ({
+                        ...prev,
+                        driverName: userData.name
+                    }));
+                }
+            }
+        };
+        // Fetch driver info and assigned vehicle for the current user
+        const fetchDriverAndCar = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            console.log('User:', user);
+            if (user) {
+                const { data: driverData, error: driverError } = await supabase
+                    .from('Drivers')
+                    .select('id, vehicle_id')
+                    .eq('user_id', user.id)
+                    .single();
+                console.log('DriverData:', driverData, 'DriverError:', driverError);
 
-                const { data: usersData, error: usersError } = await supabase.from('Users').select('*');
-                if (usersError) throw usersError;
-                setUsers(usersData);
-
-                const { data: reportsData, error: reportsError } = await supabase.from('Reports').select('*');
-                if (reportsError) throw reportsError;
-                setReports(reportsData);
-
-                const { data: notificationsData, error: notificationsError } = await supabase.from('Notifications').select('*');
-                if (notificationsError) throw notificationsError;
-                setNotifications(notificationsData);
-            } catch (error) {
-                console.error('Error fetching data:', error.message);
+                if (!driverError && driverData) {
+                    if (driverData.vehicle_id) {
+                        const { data: vehicleData, error: vehicleError } = await supabase
+                            .from('Vehicles')
+                            .select('model, license_plate')
+                            .eq('id', driverData.vehicle_id)
+                            .single();
+                        console.log('VehicleData:', vehicleData, 'VehicleError:', vehicleError);
+                    
+                        if (!vehicleError && vehicleData) {
+                            setForm((prev) => ({
+                                ...prev,
+                                car: `${vehicleData.model} (${vehicleData.license_plate})`
+                            }));
+                        } else {
+                            setForm((prev) => ({
+                                ...prev,
+                                car: 'Vehicle not found'
+                            }));
+                        }
+                    } else {
+                        setForm((prev) => ({
+                            ...prev,
+                            car: 'No vehicle assigned'
+                        }));
+                    }
+                }
             }
         };
 
-        fetchData();
+        fetchDriverAndCar();
+        fetchDriverName();
     }, []);
+
+
+    // Get location
+    useEffect(() => {
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    setForm((prev) => ({
+                        ...prev,
+                        location: `${latitude},${longitude}`
+                    }));
+                },
+                () => {
+                    setForm((prev) => ({
+                        ...prev,
+                        location: 'Location unavailable'
+                    }));
+                }
+            );
+        } else {
+            setForm((prev) => ({
+                ...prev,
+                location: 'Geolocation not supported'
+            }));
+        }
+    }, []);
+
+    // Fetch existing reports
+    // Fetch existing reports
+    // (Removed unused reports state and fetchReports effect)
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        setForm((prev) => ({
+            ...prev,
+            [id]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        const { error } = await supabase.from('Reports').insert([
+            {
+                type: 'daily',
+                data: {
+                    driverName: form.driverName,
+                    car: form.car,
+                    location: form.location,
+                    gas: Number(form.gas)
+                },
+                generated_at: new Date().toISOString()
+            }
+        ]);
+
+        setLoading(false);
+        if (!error) {
+            setForm({ driverName: form.driverName, car: form.car, location: form.location, gas: '' });
+            alert('Report submitted!');
+        } else {
+            alert('Error submitting report');
+        }
+    };
 
     return (
         <div>
             <h1>Daily Report Form</h1>
-            <form onSubmit={console.log('Form changed')}>
+            <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="driverName">Driver Name</label>
-                    <input type="text" id="driverName" className="form-control" placeholder="Enter driver's name" />
+                    <input
+                        type="text"
+                        id="driverName"
+                        className="form-control"
+                        value={form.driverName}
+                        readOnly
+                    />
                 </div>
                 <div className="form-group">
                     <label htmlFor="car">Car</label>
-                    <input type="text" id="car" className="form-control" placeholder="Enter car details" />
+                    <input
+                        type="text"
+                        id="car"
+                        className="form-control"
+                        value={form.car}
+                        readOnly
+                    />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="location">Location</label>
-                    <input type="text" id="location" className="form-control" placeholder="Enter current location" />
+                    <label htmlFor="location">Location (Lat,Lng)</label>
+                    <input
+                        type="text"
+                        id="location"
+                        className="form-control"
+                        value={form.location}
+                        readOnly
+                    />
                 </div>
                 <div className="form-group">
                     <label htmlFor="gas">Gas Used</label>
-                    <input type="number" id="gas" className="form-control" placeholder="Enter gas used (in liters)" />
+                    <input
+                        type="number"
+                        id="gas"
+                        className="form-control"
+                        placeholder="Enter gas used (in liters)"
+                        value={form.gas}
+                        onChange={handleChange}
+                        required
+                        min="0"
+                    />
                 </div>
-                <button type="submit" className="btn btn-primary">Submit Report</button>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                    {loading ? 'Submitting...' : 'Submit Report'}
+                </button>
             </form>
-
-            <h2>Fetched Data</h2>
-            <div>
-                <h3>Drivers</h3>
-                <ul>
-                    {drivers.map(driver => (
-                        <li key={driver.id}>{driver.user_id} - {driver.status}</li>
-                    ))}
-                </ul>
-            </div>
-            <div>
-                <h3>Users</h3>
-                <ul>
-                    {users.map(user => (
-                        <li key={user.id}>{user.name} - {user.role}</li>
-                    ))}
-                </ul>
-            </div>
-            <div>
-                <h3>Reports</h3>
-                <ul>
-                    {reports.map(report => (
-                        <li key={report.id}>{report.type} - {JSON.stringify(report.data)}</li>
-                    ))}
-                </ul>
-            </div>
-            <div>
-                <h3>Notifications</h3>
-                <ul>
-                    {notifications.map(notification => (
-                        <li key={notification.id}>{notification.message} - {notification.status}</li>
-                    ))}
-                </ul>
-            </div>
         </div>
     );
 };
