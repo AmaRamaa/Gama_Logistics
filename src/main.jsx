@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppRoutes from './routes/AppRoutes';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Provider } from 'react-redux';
 import { store } from './store/store';
+import { Provider } from 'react-redux';
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(

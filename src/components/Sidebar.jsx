@@ -10,6 +10,8 @@ const Sidebar = () => {
     { name: 'Notification', icon: 'bi-bell', path: '/notification' },
     { name: 'Driver', icon: 'bi-person-badge', path: '/driver' },
     { name: 'Create', icon: 'bi-plus-circle', path: '/create' },
+    { name: 'Edit', icon: 'bi-pencil-square', path: '/edit' },
+    { name: 'Help', icon: 'bi-question-circle', path: '/help' },
   ];
 
   return (

@@ -19,6 +19,7 @@ const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
 const Settings = lazy(() => import('../pages/Settings/Settings'));
 const Vehicles = lazy(() => import('../pages/Vehicles/Vehicle'));
 const Create = lazy(() => import('../pages/Create/Create'));
+const Edit = lazy(() => import('../pages/Edit/Edit'));
 
 const topbarAttributesMap = {
     '/dashboard': ['Summary', 'Live Map', 'Recent', 'Notifications'],
@@ -30,6 +31,8 @@ const topbarAttributesMap = {
     '/vehicle': ['Go Back'],
     '/settings': ['Profile', 'Security', 'Display', 'Language'],
     '/create' : ['Driver', 'Vehicle', 'User'],
+    '/edit' : ['Driver', 'Vehicle', 'User', 'Route', 'Report'],
+    '/help': ['FAQ', 'Contact Us'],
 };
 
 // Detect mobile user
@@ -189,6 +192,9 @@ const AppRoutes = () => (
 
                                     <Route path="/create" element={<Create />} />
                                     <Route path="/create/:topbarAttributes" element={<Create />} />
+
+                                    <Route path="/edit" element={<Edit />} />
+                                    <Route path="/edit/:topbarAttributes" element={<Edit />} />
 
                                     {/* 404 Route */}
 

@@ -35,6 +35,7 @@ Databases and Tables
       - `license_plate` (String, Unique)
       - `model` (String)
       - `capacity` (Integer, in kg)
+      - `location` [lat,lng] (varchart)
       - `status` (Enum: available, in_use, maintenance)
       - `last_maintenance_date` (Date)
       - `created_at` (Timestamp)
