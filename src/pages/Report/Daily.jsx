@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../supaBase/supaBase';
+import 'leaflet/dist/leaflet.css';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import Driver from '../Create/Driver';
 
 const Daily = () => {
     const [form, setForm] = useState({
@@ -10,11 +13,10 @@ const Daily = () => {
     });
     const [loading, setLoading] = useState(false);
 
-    // Fetch current user and driver/vehicle info
+    // Fetch current user and driver name only
     useEffect(() => {
         const fetchDriverName = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            console.log(user);
             if (user) {
                 const { data: userData, error } = await supabase
                     .from('Users')
@@ -29,52 +31,13 @@ const Daily = () => {
                 }
             }
         };
-        // Fetch driver info and assigned vehicle for the current user
-        const fetchDriverAndCar = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            console.log('User:', user);
-            if (user) {
-                const { data: driverData, error: driverError } = await supabase
-                    .from('Drivers')
-                    .select('id, vehicle_id')
-                    .eq('user_id', user.id)
-                    .single();
-                console.log('DriverData:', driverData, 'DriverError:', driverError);
-
-                if (!driverError && driverData) {
-                    if (driverData.vehicle_id) {
-                        const { data: vehicleData, error: vehicleError } = await supabase
-                            .from('Vehicles')
-                            .select('model, license_plate')
-                            .eq('id', driverData.vehicle_id)
-                            .single();
-                        console.log('VehicleData:', vehicleData, 'VehicleError:', vehicleError);
-                    
-                        if (!vehicleError && vehicleData) {
-                            setForm((prev) => ({
-                                ...prev,
-                                car: `${vehicleData.model} (${vehicleData.license_plate})`
-                            }));
-                        } else {
-                            setForm((prev) => ({
-                                ...prev,
-                                car: 'Vehicle not found'
-                            }));
-                        }
-                    } else {
-                        setForm((prev) => ({
-                            ...prev,
-                            car: 'No vehicle assigned'
-                        }));
-                    }
-                }
-            }
-        };
-
-        fetchDriverAndCar();
+        // Set car to empty or a default value
+        setForm((prev) => ({
+            ...prev,
+            car: ''
+        }));
         fetchDriverName();
     }, []);
-
 
     // Get location
     useEffect(() => {
@@ -102,9 +65,6 @@ const Daily = () => {
         }
     }, []);
 
-    // Fetch existing reports
-    // Fetch existing reports
-    // (Removed unused reports state and fetchReports effect)
     const handleChange = (e) => {
         const { id, value } = e.target;
         setForm((prev) => ({
@@ -112,6 +72,24 @@ const Daily = () => {
             [id]: value
         }));
     };
+    useEffect(() => {
+        const fetchVehicles = async () => {
+            const { data, error } = await supabase
+                .from('Vehicles')
+                .select('*')
+                .order('model');
+            if (!error && data) {
+                setVehicles(data.map(v => ({
+                    model: v.model,
+                    license_plate: v.license_plate
+                })));
+                console.log('Fetched vehicles:', data);
+            }
+        };
+        fetchVehicles();
+    }, []);
+
+    const [vehicles, setVehicles] = useState([]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -122,11 +100,13 @@ const Daily = () => {
                 type: 'daily',
                 data: {
                     driverName: form.driverName,
-                    car: form.car,
+                    car: driverVehicle
+                        ? `${driverVehicle.model} (${driverVehicle.license_plate})`
+                        : '',
                     location: form.location,
                     gas: Number(form.gas)
                 },
-                generated_at: new Date().toISOString()
+                created_at: new Date().toISOString()
             }
         ]);
 
@@ -138,6 +118,32 @@ const Daily = () => {
             alert('Error submitting report');
         }
     };
+
+    // State for map center
+    const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
+    // Ref for map instance
+    const [mapInstance, setMapInstance] = useState(null);
+
+    // Update map center when location changes
+    useEffect(() => {
+    if (
+        form.location &&
+        form.location !== 'Location unavailable' &&
+        form.location !== 'Geolocation not supported'
+    ) {
+        const coords = form.location.split(',').map(Number);
+        setMapCenter(coords);
+        if (mapInstance) {
+            mapInstance.flyTo(coords, 13); // 13 is the zoom level
+        }
+    }
+}, [form.location, mapInstance]);
+
+
+    // Find the vehicle for the current driver
+    // If you want to select a vehicle by model name (or another property), adjust as needed.
+    // For now, just select the first vehicle as a placeholder.
+    const driverVehicle = vehicles.length > 0 ? vehicles[0] : null;
 
     return (
         <div>
@@ -159,7 +165,11 @@ const Daily = () => {
                         type="text"
                         id="car"
                         className="form-control"
-                        value={form.car}
+                        value={
+                            driverVehicle
+                                ? `${driverVehicle.model} (${driverVehicle.license_plate})`
+                                : 'Null'
+                        }
                         readOnly
                     />
                 </div>
@@ -167,35 +177,25 @@ const Daily = () => {
                     <label>Location</label>
                     <div style={{ height: '300px', width: '100%', borderRadius: '8px', marginBottom: '1rem' }}>
                         <MapContainer
-                            center={
-                                form.location && form.location !== 'Location unavailable' && form.location !== 'Geolocation not supported'
-                                    ? form.location.split(',').map(Number)
-                                    : [51.505, -0.09]
-                            }
+                            center={mapCenter}
                             zoom={13}
                             scrollWheelZoom={true}
                             style={{ height: '100%', width: '100%', borderRadius: '8px' }}
+                            whenCreated={setMapInstance}
                         >
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
-                            {form.location && form.location !== 'Location unavailable' && form.location !== 'Geolocation not supported' && (
-                                <Marker position={form.location.split(',').map(Number)}>
-                                    <Popup>
-                                        Current Location
-                                    </Popup>
-                                </Marker>
-                            )}
+                        {form.location && (
+                            <Marker position={mapCenter}>
+                                <Popup>
+                                    Your location: {form.location}
+                                </Popup>
+                            </Marker>
+                        )}
                         </MapContainer>
                     </div>
-                    <input
-                        type="text"
-                        id="location"
-                        className="form-control"
-                        value={form.location}
-                        readOnly
-                    />
                 </div>
                 <div className="form-group">
                     <label htmlFor="gas">Gas Used</label>
