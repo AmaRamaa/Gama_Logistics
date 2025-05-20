@@ -31,11 +31,13 @@ const SystemNotifications = () => {
                 <div
                     key={notification.id}
                     style={{
-                        border: "1px solid #ccc",
-                        borderRadius: "8px",
-                        padding: "16px",
-                        width: "300px",
-                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                        margin: "0 0 8px 0",
+                            color: "#555",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: "100%",
+                            display: "block",
                     }}
                 >
                     <h3 style={{ margin: "0 0 8px 0" }}>{notification.message}</h3>
