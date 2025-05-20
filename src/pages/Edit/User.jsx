@@ -51,13 +51,13 @@ const Driver = () => {
 
     const handleSave = async () => {
         const { data, error } = await supabase
-            .from('users')
+            .from('Users')
             .update(form)
             .eq('id', editingUser)
             .select()
             .single();
         if (!error && data) {
-            setUsers(users.map(u => u.id === editingUser ? data : u));
+            setUsers(Users.map(u => u.id === editingUser ? data : u));
             setEditingUser(null);
         }
     };
@@ -65,11 +65,11 @@ const Driver = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this user?')) return;
         const { error } = await supabase
-            .from('users')
+            .from('Users')
             .delete()
             .eq('id', id);
         if (!error) {
-            setUsers(users.filter(u => u.id !== id));
+            setUsers(Users.filter(u => u.id !== id));
         }
     };
 

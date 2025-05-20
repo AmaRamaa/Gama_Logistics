@@ -164,7 +164,31 @@ const Daily = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="location">Location (Lat,Lng)</label>
+                    <label>Location</label>
+                    <div style={{ height: '300px', width: '100%', borderRadius: '8px', marginBottom: '1rem' }}>
+                        <MapContainer
+                            center={
+                                form.location && form.location !== 'Location unavailable' && form.location !== 'Geolocation not supported'
+                                    ? form.location.split(',').map(Number)
+                                    : [51.505, -0.09]
+                            }
+                            zoom={13}
+                            scrollWheelZoom={true}
+                            style={{ height: '100%', width: '100%', borderRadius: '8px' }}
+                        >
+                            <TileLayer
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            />
+                            {form.location && form.location !== 'Location unavailable' && form.location !== 'Geolocation not supported' && (
+                                <Marker position={form.location.split(',').map(Number)}>
+                                    <Popup>
+                                        Current Location
+                                    </Popup>
+                                </Marker>
+                            )}
+                        </MapContainer>
+                    </div>
                     <input
                         type="text"
                         id="location"
