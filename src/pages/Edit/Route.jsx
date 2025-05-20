@@ -29,6 +29,10 @@ const RoutingMachine = ({ waypoints, color }) => {
     const map = useMap();
     const routingControlRef = useRef(null);
 
+
+
+
+
     useEffect(() => {
         if (!map || !waypoints.length) return;
 
@@ -152,6 +156,45 @@ const RouteEditor = () => {
         }
     };
 
+    const exportToCSV = () => {
+        const headers = [
+            'ID',
+            'Name',
+            'Status',
+            'Distance',
+            'Estimated Time',
+            'Start Point',
+            'End Point',
+            'Created At',
+            'Updated At'
+        ];
+
+        const rows = routes.map(route => [
+            route.id,
+            route.name || '',
+            route.status || '',
+            route.distance || '',
+            route.estimated_time || '',
+            route.start_point || '',
+            route.end_point || '',
+            route.created_at || '',
+            route.updated_at || ''
+        ]);
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'routes.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     return (
         <div className="container my-4">
             <div className="card shadow">
@@ -183,10 +226,14 @@ const RouteEditor = () => {
                             </div>
                             {selectedRoute && waypoints.length === 2 && (
                                 <div className="mt-3">
-                    <h2 className="card-title mb-3">Edit Routes</h2>
-                    <p className="text-secondary mb-3">
-                        You are supposed to Drag the icons.
-                    </p>
+                                    <h2 className="card-title mb-3">Edit Routes</h2>
+                                    <button className="btn btn-outline-success mb-3" onClick={exportToCSV}>
+                                        Export as CSV
+                                    </button>
+
+                                    <p className="text-secondary mb-3">
+                                        You are supposed to Drag the icons.
+                                    </p>
                                     <form className="row g-3 align-items-center mb-3">
                                         <div className="col-md-3">
                                             <label className="form-label mb-1">Route Name</label>

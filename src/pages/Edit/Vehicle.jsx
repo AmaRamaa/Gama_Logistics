@@ -41,6 +41,58 @@ const VehicleEdit = () => {
     const [form, setForm] = useState({});
     const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
 
+    const exportToCSV = () => {
+        const headers = [
+            'ID',
+            'User Name',
+            'License Number',
+            'Rating',
+            'Status',
+            'Latitude',
+            'Longitude',
+            'Last Service Date',
+            'Assigned Vehicle',
+            'Created At',
+            'Updated At',
+            'Vehicle Model',
+            'Vehicle Plate'
+        ];
+
+        const rows = drivers.map(driver => {
+            const user = driverUsers.find(u => u.id === driver.user_id);
+            const vehicle = vehicles.find(v => v.id === driver.vehicle_id);
+            return [
+                driver.id,
+                user ? user.name : driver.user_id,
+                driver.license_number,
+                driver.rating,
+                driver.status,
+                driver.latitude,
+                driver.longitude,
+                driver.last_service_date || '-',
+                driver.assigned_vehicle || '-',
+                driver.created_at,
+                driver.updated_at || '-',
+                vehicle ? vehicle.model : '-',
+                vehicle ? vehicle.license_plate : '-'
+            ];
+        });
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'drivers.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+
     const fetchAll = async () => {
         const [
             { data: vehiclesData },
@@ -126,6 +178,10 @@ const VehicleEdit = () => {
         <div className="container mt-4">
             <h2 className="mb-4">Edit Vehicle Page</h2>
             <h3>Vehicles</h3>
+            <button className="btn btn-outline-success mb-3" onClick={exportToCSV}>
+                Export as CSV
+            </button>
+
             <div className="table-responsive">
                 <table className="table table-bordered table-striped">
                     <thead className="thead-dark">

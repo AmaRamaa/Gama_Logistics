@@ -7,7 +7,7 @@ import 'leaflet/dist/leaflet.css';
 function LocationMarker({ setMarker, setForm }) {
     useMapEvents({
         click(e) {
-            setMarker({ lat: e.latlng.lat, lng: e.latlng.lng    });
+            setMarker({ lat: e.latlng.lat, lng: e.latlng.lng });
             setForm((prev) => ({
                 ...prev,
                 latitude: e.latlng.lat.toFixed(6),
@@ -22,6 +22,58 @@ const Driver = () => {
     const [drivers, setDrivers] = useState([]);
     const [driverUsers, setDriverUsers] = useState([]);
     const [vehicles, setVehicles] = useState([]);
+
+    const exportToCSV = () => {
+        const headers = [
+            'ID',
+            'User Name',
+            'License Number',
+            'Rating',
+            'Status',
+            'Latitude',
+            'Longitude',
+            'Last Service Date',
+            'Assigned Vehicle',
+            'Created At',
+            'Updated At',
+            'Vehicle Model',
+            'Vehicle Plate'
+        ];
+
+        const rows = drivers.map(driver => {
+            const user = driverUsers.find(u => u.id === driver.user_id);
+            const vehicle = vehicles.find(v => v.id === driver.vehicle_id);
+            return [
+                driver.id,
+                user ? user.name : driver.user_id,
+                driver.license_number,
+                driver.rating,
+                driver.status,
+                driver.latitude,
+                driver.longitude,
+                driver.last_service_date || '-',
+                driver.assigned_vehicle || '-',
+                driver.created_at,
+                driver.updated_at || '-',
+                vehicle ? vehicle.model : '-',
+                vehicle ? vehicle.license_plate : '-'
+            ];
+        });
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'drivers.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
 
     const fetchAll = async () => {
         const [
@@ -119,6 +171,9 @@ const Driver = () => {
         <div className="container mt-4">
             <h2 className="mb-4">Edit Driver Page</h2>
             <h3>Drivers</h3>
+            <button className="btn btn-outline-success mb-3" onClick={exportToCSV}>
+                Export as CSV
+            </button>
             <div className="table-responsive">
                 <table className="table table-bordered table-striped">
                     <thead className="thead-dark">
@@ -159,7 +214,7 @@ const Driver = () => {
                                     <td>{driver.assigned_vehicle || '-'}</td>
                                     <td>{driver.created_at}</td>
                                     <td>{driver.updated_at || '-'}</td>
-                                    <td>{vehicle ? vehicle.model+" | "+vehicle.license_plate : driver.vehicle_id}</td>
+                                    <td>{vehicle ? vehicle.model + " | " + vehicle.license_plate : driver.vehicle_id}</td>
                                     <td>
                                         <button className="btn btn-sm btn-primary mr-2" onClick={() => handleEdit(driver)}>Edit</button>
                                         <button className="btn btn-sm btn-danger" onClick={() => handleDelete(driver.id)}>Delete</button>
@@ -223,7 +278,7 @@ const Driver = () => {
                             <select className="form-control" name="vehicle_id" value={form.vehicle_id} onChange={handleChange}>
                                 <option value="">-- Select Vehicle --</option>
                                 {vehicles.map(v => (
-                                    <option key={v.id} value={v.id}>{v.model+" | "+v.license_plate}</option>
+                                    <option key={v.id} value={v.id}>{v.model + " | " + v.license_plate}</option>
                                 ))}
                             </select>
                         </div>

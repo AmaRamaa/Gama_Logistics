@@ -25,6 +25,50 @@ const Report = () => {
     const [form, setForm] = useState({});
     const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
 
+    const exportToCSV = () => {
+        const headers = [
+            'ID',
+            'Type',
+            'Driver Name',
+            'Car',
+            'Location',
+            'Gas',
+            'Created At'
+        ];
+
+        const rows = reports.map(report => {
+            let parsedData = {};
+            try {
+                parsedData = report.data && typeof report.data === 'string'
+                    ? JSON.parse(report.data)
+                    : (report.data || {});
+            } catch { parsedData = {}; }
+            return [
+                report.id,
+                report.type || '',
+                parsedData.driverName || '',
+                parsedData.car || '',
+                parsedData.location || '',
+                parsedData.gas || '',
+                report.created_at || ''
+            ];
+        });
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'reports.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+
     const fetchReports = async () => {
         const { data, error } = await supabase.from('Reports').select('*');
         if (!error) setReports(data || []);
@@ -104,6 +148,10 @@ const Report = () => {
     return (
         <div className="container mt-4">
             <h2 className="mb-4">Edit Reports Page</h2>
+            <button className="btn btn-outline-success mb-3" onClick={exportToCSV}>
+                Export as CSV
+            </button>
+
             <div className="table-responsive">
                 <table className="table table-bordered table-striped">
                     <thead className="thead-dark">
@@ -235,13 +283,13 @@ const Report = () => {
                                 placeholder="Location (lat,lng)"
                             />
                             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-    <button className="btn btn-secondary mr-2" onClick={handleOverlayClose}>
-        Cancel
-    </button>
-    <button className="btn btn-success" onClick={handleSave}>
-        Save
-    </button>
-</div>
+                                <button className="btn btn-secondary mr-2" onClick={handleOverlayClose}>
+                                    Cancel
+                                </button>
+                                <button className="btn btn-success" onClick={handleSave}>
+                                    Save
+                                </button>
+                            </div>
 
                         </div>
                     </div>

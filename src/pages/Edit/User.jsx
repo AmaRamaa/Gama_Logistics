@@ -20,6 +20,40 @@ const Driver = () => {
         phone: ''
     });
 
+    const exportToCSV = () => {
+        const headers = [
+            'ID',
+            'Name',
+            'Email',
+            'Avatar URL',
+            'Role',
+            'Phone'
+        ];
+
+        const rows = users.map(user => [
+            user.id,
+            user.name,
+            user.email,
+            user.avatar_url,
+            user.role,
+            user.phone
+        ]);
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(field => `"${String(field ?? '').replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'users.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+
     React.useEffect(() => {
         const fetchUsers = async () => {
             const { data, error } = await supabase
@@ -57,7 +91,7 @@ const Driver = () => {
             .select()
             .single();
         if (!error && data) {
-            setUsers(Users.map(u => u.id === editingUser ? data : u));
+            setUsers(users.map(u => u.id === editingUser ? data : u));
             setEditingUser(null);
         }
     };
@@ -69,13 +103,18 @@ const Driver = () => {
             .delete()
             .eq('id', id);
         if (!error) {
-            setUsers(Users.filter(u => u.id !== id));
+            setUsers(users.filter(u => u.id !== id));
         }
     };
 
     return (
         <div className="container mt-4">
-            <h2>Edit Users</h2>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2>Users</h2>
+                <button className="btn btn-outline-success" onClick={exportToCSV}>
+                    Export to CSV
+                </button>
+            </div>
             <table className="table table-bordered table-hover mt-3">
                 <thead className="thead-dark">
                     <tr>
