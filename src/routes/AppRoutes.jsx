@@ -20,6 +20,8 @@ const Settings = lazy(() => import('../pages/Settings/Settings'));
 const Vehicles = lazy(() => import('../pages/Vehicles/Vehicle'));
 const Create = lazy(() => import('../pages/Create/Create'));
 const Edit = lazy(() => import('../pages/Edit/Edit'));
+const Help = lazy(() => import('../pages/Help/Help'));
+
 
 const topbarAttributesMap = {
     '/dashboard': ['Summary', 'Live Map', 'Recent', 'Notifications'],
@@ -195,6 +197,9 @@ const AppRoutes = () => (
 
                                     <Route path="/edit" element={<Edit />} />
                                     <Route path="/edit/:topbarAttributes" element={<Edit />} />
+
+                                    <Route path="/help" element={<Help />} />
+                                    <Route path="/help/:topbarAttributes" element={<Help />} />
 
                                     {/* 404 Route */}
 
