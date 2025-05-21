@@ -11,6 +11,7 @@ const Sidebar = () => {
     { name: 'Driver', icon: 'bi-person-badge', path: '/driver' },
     { name: 'Create', icon: 'bi-plus-circle', path: '/create' },
     { name: 'Edit', icon: 'bi-pencil-square', path: '/edit' },
+    { name: 'Invoice', icon: 'bi-file-earmark-text', path: '/invoice' },
     { name: 'Help', icon: 'bi-question-circle', path: '/help' },
   ];
 

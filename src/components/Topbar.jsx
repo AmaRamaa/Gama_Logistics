@@ -191,7 +191,7 @@ const Topbar = ({ topAtribute = [] }) => {
                     </li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><NavLink to="/settings" className="dropdown-item">Settings</NavLink></li>
-                    <li><NavLink to="/support" className="dropdown-item">Support</NavLink></li>
+                    <li><NavLink to="/help" className="dropdown-item">Help</NavLink></li>
                     <li>
                         <button
                             className="dropdown-item text-danger"

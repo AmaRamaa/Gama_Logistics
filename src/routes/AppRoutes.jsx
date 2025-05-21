@@ -21,6 +21,7 @@ const Vehicles = lazy(() => import('../pages/Vehicles/Vehicle'));
 const Create = lazy(() => import('../pages/Create/Create'));
 const Edit = lazy(() => import('../pages/Edit/Edit'));
 const Help = lazy(() => import('../pages/Help/Help'));
+const Invoice = lazy(() => import('../pages/Invoice/InvoiceRoute'));
 
 
 const topbarAttributesMap = {
@@ -35,6 +36,7 @@ const topbarAttributesMap = {
     '/create' : ['Driver', 'Vehicle', 'User', 'Parcel'],
     '/edit' : ['Driver', 'Vehicle', 'User', 'Route', 'Report', 'Parcel'],
     '/help': ['FAQ', 'Contact Us'],
+    '/invoice': ['Invoice', 'Payment', 'History'],
 };
 
 // Detect mobile user
@@ -200,6 +202,9 @@ const AppRoutes = () => (
 
                                     <Route path="/help" element={<Help />} />
                                     <Route path="/help/:topbarAttributes" element={<Help />} />
+
+                                    <Route path="/invoice" element={<Invoice />} />
+                                    <Route path="/invoice/:topbarAttributes" element={<Invoice />} />
 
                                     {/* 404 Route */}
 
