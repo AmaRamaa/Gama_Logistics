@@ -25,7 +25,7 @@ const Invoice = lazy(() => import('../pages/Invoice/InvoiceRoute'));
 
 
 const topbarAttributesMap = {
-    '/dashboard': ['Summary', 'Live Map', 'Recent', 'Notifications'],
+    '/dashboard': ['Summary', 'Live Map', 'Notifications'],
     '/plan-route': ['North', 'South', 'East', 'West'],
     '/fleet': ['Available', 'In Maintenance', 'Use'],
     '/notification': ['Unread', 'All', 'System'],
