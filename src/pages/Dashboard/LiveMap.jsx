@@ -7,10 +7,9 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { supabase } from '../../supaBase/supaBase';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
-
 // Truck 3D-style icon
 const truckIcon = new L.Icon({
-    iconUrl: 'https://cdn-icons-png.flaticon.com/512/1995/1995574.png', // Example truck icon
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/1995/1995574.png',
     iconSize: [40, 40],
     iconAnchor: [20, 40],
     popupAnchor: [0, -35],
@@ -18,7 +17,7 @@ const truckIcon = new L.Icon({
 
 // Depot 3D-style icon
 const depotIcon = new L.Icon({
-    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2910/2910793.png', // Example warehouse icon
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/2910/2910793.png',
     iconSize: [40, 40],
     iconAnchor: [20, 40],
     popupAnchor: [0, -35],
@@ -31,13 +30,9 @@ const RoutingMachine = ({ waypoints, color }) => {
 
     useEffect(() => {
         if (!map) return;
-
-        // Remove previous control
         if (routingControlRef.current) {
             map.removeControl(routingControlRef.current);
         }
-
-        // Add new routing control with custom line options
         routingControlRef.current = L.Routing.control({
             waypoints: waypoints.map((point) => L.latLng(point.lat, point.lng)),
             routeWhileDragging: false,
@@ -46,29 +41,16 @@ const RoutingMachine = ({ waypoints, color }) => {
             draggableWaypoints: false,
             fitSelectedRoutes: true,
             lineOptions: {
-            styles: [{ color, weight: 6, opacity: 0.8 }], // Use the provided color
+                styles: [{ color, weight: 6, opacity: 0.8 }],
             },
             router: L.Routing.osrmv1({
-            serviceUrl: 'https://router.project-osrm.org/route/v1',
+                serviceUrl: 'https://router.project-osrm.org/route/v1',
             }),
         }).addTo(map);
 
-        // Test console log for OSRM's response
-        const testLatLng = waypoints.map((point) => `${point.lat},${point.lng}`).join(';');
-        const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${testLatLng}?overview=false`;
-        fetch(osrmUrl)
-            .then((response) => response.json())
-            .then((data) => {
-            console.log('OSRM Response:', data);
-            })
-            .catch((error) => {
-            console.error('Error fetching OSRM data:', error);
-            });
-        
         return () => {
             if (routingControlRef.current) {
                 map.removeControl(routingControlRef.current);
-                console.log('Routing control added:', routingControlRef.current);
             }
         };
     }, [map, waypoints, color]);
@@ -78,22 +60,28 @@ const RoutingMachine = ({ waypoints, color }) => {
 
 const LiveMap = () => {
     const [waypoints, setWaypoints] = useState([]);
+    const [routes, setRoutes] = useState([]); // Store all routes from DB
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState('all'); // Filtering state
 
     useEffect(() => {
         const fetchingWaypoints = async () => {
             const { data, error } = await supabase.from('Routes').select('*');
             if (data) {
+                setRoutes(data); // Save all routes for filtering
                 const fetchedWaypoints = data.map((route) => {
                     const [startLat, startLng] = JSON.parse(route.start_point.replace(/'/g, '"'));
                     const [endLat, endLng] = JSON.parse(route.end_point.replace(/'/g, '"'));
-                    return [
-                        { lat: startLat, lng: startLng },
-                        { lat: endLat, lng: endLng },
-                    ];
+                    return {
+                        id: route.id,
+                        name: route.name || `Route ${route.id}`,
+                        points: [
+                            { lat: startLat, lng: startLng },
+                            { lat: endLat, lng: endLng },
+                        ],
+                    };
                 });
                 setWaypoints(fetchedWaypoints);
-                console.log('Waypoints fetched:', fetchedWaypoints);
             }
             if (error) {
                 console.error('Error fetching waypoints:', error);
@@ -102,19 +90,23 @@ const LiveMap = () => {
         fetchingWaypoints();
     }, []);
 
-    // Removed redundant useEffect block referencing map and routingControlRef
-
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 2000); // Simulate a 2-second loading time
+        }, 2000);
         return () => clearTimeout(timer);
     }, []);
 
     const generateColor = (index) => {
         const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF', '#33FFF5'];
-        return colors[index % colors.length]; // Cycle through predefined colors
+        return colors[index % colors.length];
     };
+
+    // Filtered waypoints based on filter state
+    const filteredWaypoints =
+        filter === 'all'
+            ? waypoints
+            : waypoints.filter((route) => String(route.id) === filter);
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#f9f9f9' }}>
@@ -122,6 +114,25 @@ const LiveMap = () => {
             <p style={{ color: '#555', textAlign: 'center', marginBottom: '20px' }}>
                 Track your deliveries in real-time on the map below:
             </p>
+            {/* Filtering Dropdown */}
+            <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                <label htmlFor="routeFilter" style={{ marginRight: '10px', fontWeight: 'bold' }}>
+                    Filter by Route:
+                </label>
+                <select
+                    id="routeFilter"
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    style={{ padding: '5px 10px', borderRadius: '4px', border: '1px solid #ccc' }}
+                >
+                    <option value="all">All Routes</option>
+                    {routes.map((route) => (
+                        <option key={route.id} value={route.id}>
+                            {route.name || `Route ${route.id}`}
+                        </option>
+                    ))}
+                </select>
+            </div>
             {loading ? (
                 <div
                     style={{
@@ -171,11 +182,11 @@ const LiveMap = () => {
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
 
-                        {waypoints.map((route, index) => (
-                            <React.Fragment key={index}>
-                                {route.map((point, pointIndex) => (
+                        {filteredWaypoints.map((route, index) => (
+                            <React.Fragment key={route.id}>
+                                {route.points.map((point, pointIndex) => (
                                     <Marker
-                                        key={`${index}-${pointIndex}`}
+                                        key={`${route.id}-${pointIndex}`}
                                         position={[point.lat, point.lng]}
                                         icon={pointIndex === 0 ? truckIcon : depotIcon}
                                     >
@@ -184,7 +195,7 @@ const LiveMap = () => {
                                         </Popup>
                                     </Marker>
                                 ))}
-                                <RoutingMachine waypoints={route} color={generateColor(index)} />
+                                <RoutingMachine waypoints={route.points} color={generateColor(index)} />
                             </React.Fragment>
                         ))}
                     </MapContainer>

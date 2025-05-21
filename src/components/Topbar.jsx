@@ -184,7 +184,7 @@ const Topbar = ({ topAtribute = [] }) => {
                 </span>
 
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><NavLink to="/profile" className="dropdown-item">Profile</NavLink></li>
+                    <li><NavLink to="/settings" className="dropdown-item">Profile</NavLink></li>
                     <li className="px-3">
                         <h6 className="mb-0" style={{ fontSize: '13px' }}>{user?.name}</h6>
                         <p className="text-muted mb-0" style={{ fontSize: '12px' }}>{user?.email || 'No Email'}</p>
