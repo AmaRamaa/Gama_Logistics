@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Driver from './Driver';
 import User from './User';
 import Vehicle from './Vehicle';
+import Parcel from './Parcel';
 
 const Create = () => {
   const { topbarAttributes } = useParams();
@@ -58,6 +59,8 @@ const Create = () => {
             return <User />;
         case 'vehicle':
             return <Vehicle />;
+        case 'parcel':
+            return <Parcel />;
       default:
         return <Driver />;
     }

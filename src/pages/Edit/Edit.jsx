@@ -5,6 +5,7 @@ import Vehicle from './Vehicle';
 import User from './User';
 import Route from './Route';
 import Report from './Report';
+import Parcel from './Parcel';
 
 const Edit = () => {
   const { topbarAttributes } = useParams();
@@ -64,6 +65,8 @@ const Edit = () => {
             return <Route />;
         case 'report':
             return <Report />;
+        case 'parcel':
+            return <Parcel />;
       default:
         return <Driver />;
     }

@@ -32,8 +32,8 @@ const topbarAttributesMap = {
     '/report': ['Daily', 'Weekly', 'Monthly'],
     '/vehicle': ['Go Back'],
     '/settings': ['Profile', 'Security', 'Display', 'Language'],
-    '/create' : ['Driver', 'Vehicle', 'User'],
-    '/edit' : ['Driver', 'Vehicle', 'User', 'Route', 'Report'],
+    '/create' : ['Driver', 'Vehicle', 'User', 'Parcel'],
+    '/edit' : ['Driver', 'Vehicle', 'User', 'Route', 'Report', 'Parcel'],
     '/help': ['FAQ', 'Contact Us'],
 };
 

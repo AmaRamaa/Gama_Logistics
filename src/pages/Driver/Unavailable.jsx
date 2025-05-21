@@ -46,7 +46,7 @@ const Driver = () => {
     
     return (
         <div style={{ padding: '2rem' }}>
-            <h1>Idle Drivers</h1>
+            <h1>Unavailable Drivers</h1>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                 {drivers.map((driver) => {
                     // Find the user with id matching driver.user_id
